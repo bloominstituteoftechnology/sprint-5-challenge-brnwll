@@ -6,12 +6,14 @@ async function sprintChallenge5() { // Note the async keyword, in case you wish 
     mentors: 'http://localhost:3003/api/mentors'
   }
 
-  // Target element for our learner cards
-  let rootEl = document.querySelector('section div.cards')
+  let learners
+  let mentors
 
+  const rootEl = document.querySelector('section div.cards')
   Promise.all([axios.get(api.learners), axios.get(api.mentors)])
     .then(res => {
-      let [learners, mentors] = [res[0].data, res[1].data]
+      learners = res[0].data
+      mentors = res[1].data
       validate(learners, mentors)
       learners.forEach(learner => {
         learner.mentors = learner.mentors.map(id => {
@@ -20,16 +22,11 @@ async function sprintChallenge5() { // Note the async keyword, in case you wish 
         })
         rootEl.appendChild(createCardFor(learner))
       })
-      updateInfoP('No learner is selected')
+      updateInfoP()
     })
     .catch(err => {
       console.error(err)
     })
-
-  function updateInfoP(text) {
-    const p = document.querySelector('p.info')
-    p.textContent = text
-  }
 
   // each of the api objects should contain a 'data' key that is an Array
   // Invalid url returns a string.
@@ -67,15 +64,52 @@ async function sprintChallenge5() { // Note the async keyword, in case you wish 
   }
 
   function handleLearnerCardClick(e) {
-    document.querySelectorAll('.card').forEach(card => card.classList.remove('selected'))
-    document.querySelectorAll('.card').forEach(card => card.classList.remove('selected'))
-    e.currentTarget.classList.add('selected')
-    updateInfoP(`The selected learner is ${e.currentTarget.firstChild.textContent}`)
+    console.log('handleLearnerCardClick')
+    // 1) Clicking on unselected learner
+    if (!e.currentTarget.classList.contains('selected')) {
+      // user click a card that is not selected
+      deselectAllCards()
+      e.currentTarget.classList.add('selected')
+      updateInfoP(`The selected learner is ${e.currentTarget.firstChild.textContent}`)
+      const h3 = e.currentTarget.querySelector('h3')
+      const learner = learners.find(learner => learner.fullName === h3.textContent)
+      updateNameOn(h3, learner.id)
+    } else {
+      // user clicked a selected card
+      e.currentTarget.classList.remove('selected')
+      updateInfoP()
+      updateNameOn(e.currentTarget.querySelector('h3'))
+    }
   }
 
   function handleMentorListClick(e) {
     e.target.classList.toggle('open')
     e.target.classList.toggle('closed')
+    if (e.target.parentElement.classList.contains('selected')) {
+      e.stopPropagation()
+    }
+  }
+
+  function updateInfoP(text = 'No learner is selected') {
+    const p = document.querySelector('p.info')
+    p.textContent = text
+  }
+
+  function updateNameOn(h3, id = null) {
+    if (id) {
+      h3.textContent = `${h3.textContent}, ID ${id}`
+    } else {
+      h3.textContent = h3.textContent.split(', ID ')[0]
+    }
+  }
+
+  function deselectAllCards() {
+    document.querySelectorAll('.card').forEach(card => {
+      card.classList.remove('selected')
+      let fullName = card.firstChild.textContent
+      updateNameOn(card.firstChild)
+    })
+    updateInfoP()
   }
 
   const footer = document.querySelector('footer')
