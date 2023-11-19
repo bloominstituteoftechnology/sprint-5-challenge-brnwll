@@ -6,9 +6,11 @@ async function sprintChallenge5() { // Note the async keyword, in case you wish 
     mentors: 'http://localhost:3003/api/mentors'
   }
 
+  // Holders for API data
   let learners
   let mentors
 
+  // Fetch data, validate, build and append cards
   const rootEl = document.querySelector('section div.cards')
   Promise.all([axios.get(api.learners), axios.get(api.mentors)])
     .then(res => {
@@ -64,21 +66,19 @@ async function sprintChallenge5() { // Note the async keyword, in case you wish 
   }
 
   function handleLearnerCardClick(e) {
-    console.log('handleLearnerCardClick')
-    // 1) Clicking on unselected learner
     if (!e.currentTarget.classList.contains('selected')) {
-      // user click a card that is not selected
+      // user clicked a card that is not selected
       deselectAllCards()
       e.currentTarget.classList.add('selected')
       updateInfoP(`The selected learner is ${e.currentTarget.firstChild.textContent}`)
       const h3 = e.currentTarget.querySelector('h3')
       const learner = learners.find(learner => learner.fullName === h3.textContent)
-      updateNameOn(h3, learner.id)
+      updateCardName(h3, learner.id)
     } else {
       // user clicked a selected card
       e.currentTarget.classList.remove('selected')
       updateInfoP()
-      updateNameOn(e.currentTarget.querySelector('h3'))
+      updateCardName(e.currentTarget.querySelector('h3'))
     }
   }
 
@@ -86,6 +86,7 @@ async function sprintChallenge5() { // Note the async keyword, in case you wish 
     e.target.classList.toggle('open')
     e.target.classList.toggle('closed')
     if (e.target.parentElement.classList.contains('selected')) {
+      // we don't want clicking the mentor list on a selected card to close the card
       e.stopPropagation()
     }
   }
@@ -95,19 +96,16 @@ async function sprintChallenge5() { // Note the async keyword, in case you wish 
     p.textContent = text
   }
 
-  function updateNameOn(h3, id = null) {
-    if (id) {
-      h3.textContent = `${h3.textContent}, ID ${id}`
-    } else {
-      h3.textContent = h3.textContent.split(', ID ')[0]
-    }
+  function updateCardName(h3, id = null) {
+    h3.textContent = id
+      ? `${h3.textContent}, ID ${id}`
+      : h3.textContent.split(', ID ')[0]
   }
 
   function deselectAllCards() {
     document.querySelectorAll('.card').forEach(card => {
       card.classList.remove('selected')
-      let fullName = card.firstChild.textContent
-      updateNameOn(card.firstChild)
+      updateCardName(card.firstChild)
     })
     updateInfoP()
   }
