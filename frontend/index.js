@@ -51,6 +51,7 @@ async function sprintChallenge5() { // Note the async keyword, in case you wish 
     const openCloseH4 = document.createElement('h4')
     openCloseH4.textContent = 'Mentors'
     openCloseH4.classList.add('closed')
+    openCloseH4.addEventListener('click', handleMentorListClick)
     const mentorUl = document.createElement('ul')
     learner.mentors.forEach(mentor => {
       const mentorLi = document.createElement('li')
@@ -66,10 +67,15 @@ async function sprintChallenge5() { // Note the async keyword, in case you wish 
   }
 
   function handleLearnerCardClick(e) {
-    console.log(e.currentTarget)
+    document.querySelectorAll('.card').forEach(card => card.classList.remove('selected'))
     document.querySelectorAll('.card').forEach(card => card.classList.remove('selected'))
     e.currentTarget.classList.add('selected')
     updateInfoP(`The selected learner is ${e.currentTarget.firstChild.textContent}`)
+  }
+
+  function handleMentorListClick(e) {
+    e.target.classList.toggle('open')
+    e.target.classList.toggle('closed')
   }
 
   const footer = document.querySelector('footer')
