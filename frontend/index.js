@@ -61,7 +61,15 @@ async function sprintChallenge5() { // Note the async keyword, in case you wish 
     cardDiv.appendChild(emailDiv)
     cardDiv.appendChild(openCloseH4)
     cardDiv.appendChild(mentorUl)
+    cardDiv.addEventListener('click', handleLearnerCardClick)
     return cardDiv
+  }
+
+  function handleLearnerCardClick(e) {
+    console.log(e.currentTarget)
+    document.querySelectorAll('.card').forEach(card => card.classList.remove('selected'))
+    e.currentTarget.classList.add('selected')
+    updateInfoP(`The selected learner is ${e.currentTarget.firstChild.textContent}`)
   }
 
   const footer = document.querySelector('footer')
