@@ -20,10 +20,16 @@ async function sprintChallenge5() { // Note the async keyword, in case you wish 
         })
         rootEl.appendChild(createCardFor(learner))
       })
+      updateInfoP('No learner is selected')
     })
     .catch(err => {
       console.error(err)
     })
+
+  function updateInfoP(text) {
+    const p = document.querySelector('p.info')
+    p.textContent = text
+  }
 
   // each of the api objects should contain a 'data' key that is an Array
   // Invalid url returns a string.
